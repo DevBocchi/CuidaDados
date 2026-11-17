@@ -1,18 +1,16 @@
 # CuidaDados — GS CitizenTech (Cybersecurity)
 
-> Campos em **[PREENCHER]** precisam ser confirmados pelo grupo antes da entrega.
-
 ## Ficha da CitizenTech
 
 | Campo | Conteúdo |
 |---|---|
-| Nome da CitizenTech | CuidaDados **[PREENCHER: confirmar nome final]** |
-| Cidade e bairro | **[PREENCHER]** |
+| Nome da CitizenTech | CuidaDados |
+| Cidade e bairro | São Paulo (SP), bairro Belém |
 | Cidadão beneficiado | Pessoa idosa (60+) que usa um assistente digital de saúde e benefícios e não é especialista em tecnologia |
 | Problema, em uma frase | Idosos informam CPF, RG, senha e laudos em apps de saúde e benefícios, mas não entendem quando seus dados estão em risco. |
 | Como funciona | O backend intercepta tudo que entra, identifica e protege dados pessoais (PII), impede que vazem por logs ou respostas sem login e traduz cada bloqueio, via IA, para uma mensagem simples e um farol de risco. |
 | O que cada parte faz | Ver "Mapa da rubrica" abaixo. |
-| Link do repositório | **[PREENCHER]** |
+| Link do repositório | https://github.com/DevBocchi/CuidaDados |
 | Indicador de impacto | **Risco Cidadão**: farol verde/amarelo/vermelho (0 a 100) calculado a partir dos eventos de segurança da última hora. |
 | ODS conectados | ODS 3 (Saúde e bem-estar): protege dados de saúde. ODS 10 (Redução das desigualdades): linguagem simples para quem tem menos letramento digital. ODS 9 (Indústria, inovação e infraestrutura): segurança embutida na infraestrutura do serviço. |
 
@@ -58,7 +56,7 @@ cp .env.example .env               # Windows: copy .env.example .env
 Edite o `.env`: defina `APP_SECRET` (texto longo e aleatório) e, para a demonstração, `MODO_DEMO=1`. O `.env` **não** é versionado.
 
 ```bash
-python -m pytest -v                       # 81 testes (Partes 1 a 4)
+python -m pytest -v                       # 83 testes (Partes 1 a 4)
 python scripts/demo_taint.py              # evidência ANTES x DEPOIS (não precisa de servidor)
 python scripts/demo_ia.py                 # prompt, mensagens e defesa contra saída maliciosa do LLM
 
@@ -81,7 +79,7 @@ Clique em "Atualizar agora" (ou aguarde 15 s) entre um cenário e outro.
 | Parsing de PII (3,0) | `app/pii/` | `docs/evidencias/parte1_testes.txt` |
 | Taint Analysis (3,0) | `app/taint/`, `app/audit/`, `app/auth.py` | `docs/evidencias/parte2_testes.txt`, `parte5_taint.txt` |
 | IA para tradução (2,0) | `app/ai/` | `docs/evidencias/parte3_ia.txt`, `parte3_testes.txt` |
-| Dashboard Risco Cidadão (2,0) | `app/risk/`, `dashboard/` | `docs/evidencias/parte4_dashboard_*.png`, vídeo |
+| Dashboard Risco Cidadão (2,0) | `app/risk/`, `dashboard/` | `docs/evidencias/parte4_dashboard_*.png` |
 
 ## Decisões técnicas
 
@@ -118,7 +116,7 @@ Clique em "Atualizar agora" (ou aguarde 15 s) entre um cenário e outro.
 │   ├── ai/            # Parte 3: catálogo, prompt, provedores, tradutor
 │   └── risk/          # Parte 4: fórmula e rotas /risco e /dashboard
 ├── dashboard/         # Parte 4: painel (HTML, CSS, JS)
-├── tests/             # 81 testes
+├── tests/             # 83 testes
 ├── scripts/           # demo_taint.py, demo_ia.py, gerar_trafego.py
 └── docs/
     ├── prompts.md     # prompts usados com IA (regra da GS)

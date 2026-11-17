@@ -1,9 +1,8 @@
 # Prompts usados com IA (regra da GS)
 
 > Registro dos prompts usados com IA neste projeto, como exige a Global Solution.
-> **Atenção, grupo:** esta lista foi montada a partir da conversa com o assistente (Claude). Conferir e
-> acrescentar qualquer outro prompt que algum integrante tenha usado fora dela. Preencher também a
-> coluna "O que o grupo validou".
+> Esta lista foi montada a partir da conversa com o assistente (Claude). Se algum integrante usou IA fora
+> dela, acrescente aqui.
 
 ## A) Prompts do desenvolvimento (conversa com o Claude)
 
@@ -80,4 +79,28 @@ da saída (sem HTML, link ou PII; no máximo 2 frases), mensagem de reserva em q
 
 ## D) Validação do grupo
 
-**[PREENCHER]** Quem revisou cada parte, o que foi testado manualmente e o que foi alterado em relação à sugestão da IA.
+**O que foi testado manualmente (executado por Rafael Bocchi, na própria máquina):**
+- `python -m pytest -v`: 83 testes passando.
+- `python scripts/demo_taint.py`: resultado APROVADO (antes x depois).
+- Servidor local com `uvicorn`, geração de token com `python -m app.auth` e os três cenários do painel
+  (`gerar_trafego.py normal`, `amarelo`, `vermelho`), conferindo verde, amarelo e vermelho.
+- Chamada real ao LLM (Gemini, `gemini-flash-lite-latest`) com `python scripts/demo_ia.py`, seção 4:
+  resultado `origem=llm`. Sem chave, o sistema usa as mensagens de reserva e funciona igual.
+
+**O que o grupo alterou em relação à sugestão da IA:**
+- O modelo do Gemini sugerido primeiro devolvia HTTP 404 para a nossa chave; o grupo rodou
+  `scripts/listar_modelos.py`, trocou para `gemini-flash-lite-latest` e aumentou `LLM_TIMEOUT` para 20 s.
+- O grupo decidiu não gravar vídeo (o professor confirmou que não é necessário) e usar os três prints do painel.
+- O grupo manteve o nome CuidaDados e definiu a cidade e o bairro da CitizenTech (São Paulo, Belém).
+
+**Responsável por revisar e explicar cada parte (distribuída por sorteio entre os 5 integrantes).**
+Todos devem saber explicar o projeto inteiro (regra da GS); o responsável é quem apresenta e responde
+primeiro sobre a sua parte.
+
+| Parte | Responsável |
+|---|---|
+| Parte 1 — Parsing de PII (`app/pii/`) | André Luiz Fernandes De Queiroz (RM554503) |
+| Parte 2 — Taint Analysis e auditoria (`app/taint/`, `app/audit/`) | Rafael Bocchi (RM557603) |
+| Parte 3 — IA (`app/ai/`) | Marcos Costas (RM555490) |
+| Parte 4 — Painel Risco Cidadão (`app/risk/`, `dashboard/`) | Paulo Poças (RM556080) |
+| Visão geral, como executar e testes | Rafael Oliveira (RM554736) |
