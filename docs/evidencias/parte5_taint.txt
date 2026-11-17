@@ -1,0 +1,151 @@
+
+==========================================================================
+1A) LOG — ANTES: sem proteção (o que o código descuidado grava)
+==========================================================================
+  gravado no log -> login ok: senha=SenhaDeTeste#2026 documento=123.456.789-00
+  gravado no log -> paciente com cpf 529.982.247-25 foi atendido
+  gravado no log -> erro ao processar
+Traceback (most recent call last):
+  File "/home/claude/citizentech/scripts/demo_taint.py", line 51, in codigo_do_desenvolvedor
+    raise ValueError(f"falha ao validar cpf {CPF}")
+ValueError: falha ao validar cpf 529.982.247-25
+-> valores pessoais crus no log: 3 de 3  (VAZAMENTO)
+
+==========================================================================
+1B) LOG — DEPOIS: o MESMO código, com a proteção do módulo
+==========================================================================
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "-", "evento": "LOG_SANITIZADO", "sink": "log", "acao": "mascarado", "categorias": ["CPF", "SENHA"], "quantidade": 2, "severidade": "alta", "rota": "-", "metodo": "-", "autenticado": false}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "-", "evento": "LOG_SANITIZADO", "sink": "log", "acao": "mascarado", "categorias": ["CPF"], "quantidade": 1, "severidade": "media", "rota": "-", "metodo": "-", "autenticado": false}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "-", "evento": "LOG_SANITIZADO", "sink": "log", "acao": "mascarado", "categorias": ["CPF"], "quantidade": 1, "severidade": "media", "rota": "-", "metodo": "-", "autenticado": false}
+  gravado no log -> login ok: senha=[REDACTED:SENHA] documento=***.456.***-00
+  gravado no log -> paciente com cpf ***.982.***-25 foi atendido
+  gravado no log -> erro ao processar
+Traceback (most recent call last):
+  File "/home/claude/citizentech/scripts/demo_taint.py", line 51, in codigo_do_desenvolvedor
+    raise ValueError(f"falha ao validar cpf {CPF}")
+ValueError: falha ao validar cpf ***.982.***-25
+-> valores pessoais crus no log: 0 de 3
+
+==========================================================================
+1C) LOG — variável marcada como sensível (Source) não imprime o valor
+==========================================================================
+  gravado no log -> corpo recebido: {'nome': 'Ana', 'senha': [REDACTED:SENHA], 'documento': [REDACTED:CPF]}
+-> valores pessoais crus no log: 0 de 3
+
+==========================================================================
+2A) RESPOSTA HTTP — usuário NÃO autenticado pede eco de um CPF
+==========================================================================
+ANTES (app sem proteção):
+  HTTP 200  corpo: {"documento":"123.456.789-00"}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "5009d18a469a46f4b96c332dd32483da", "evento": "PII_RECEBIDA", "sink": "entrada", "acao": "marcada", "categorias": ["CPF"], "quantidade": 1, "severidade": "media", "rota": "/demo/eco-inseguro", "metodo": "POST", "autenticado": false}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "5009d18a469a46f4b96c332dd32483da", "evento": "RESPOSTA_BLOQUEADA", "sink": "resposta", "acao": "bloqueado", "categorias": ["CPF"], "quantidade": 1, "severidade": "media", "rota": "/demo/eco-inseguro", "metodo": "POST", "autenticado": false}
+DEPOIS (app com TaintMiddleware):
+  HTTP 403  corpo: {"erro": "Resposta bloqueada para proteger dados pessoais.", "trace_id": "5009d18a469a46f4b96c332dd32483da"}
+-> CPF cru na resposta: antes=True  depois=False
+
+==========================================================================
+2B) ERRO 422 — o corpo inválido NÃO pode voltar refletido
+==========================================================================
+ANTES (FastAPI padrão devolve `input` com o que foi enviado):
+  HTTP 422  corpo: {"detail":[{"type":"missing","loc":["body","idade"],"msg":"Field required","input":{"nome":"Ana","senha":"SenhaDeTeste#2026","cpf":"529.982.247-25"}}]}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "ac9c64767d0042c6938d87c77fbf1970", "evento": "PII_RECEBIDA", "sink": "entrada", "acao": "marcada", "categorias": ["CPF", "SENHA"], "quantidade": 2, "severidade": "alta", "rota": "/demo/cadastro", "metodo": "POST", "autenticado": false}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "ac9c64767d0042c6938d87c77fbf1970", "evento": "ENTRADA_REFLETIDA_BLOQUEADA", "sink": "erro", "acao": "bloqueado", "categorias": ["CPF", "SENHA"], "quantidade": 2, "severidade": "alta", "rota": "/demo/cadastro", "metodo": "POST", "autenticado": false}
+DEPOIS (handler próprio: só campo e motivo):
+  HTTP 422  corpo: {"erro":"Dados inválidos","campos":[{"campo":"body.idade","motivo":"Field required"}],"trace_id":"ac9c64767d0042c6938d87c77fbf1970"}
+-> senha refletida: antes=True  depois=False
+
+==========================================================================
+2C) ERRO 500 — mensagem genérica; detalhe só no log (sanitizado)
+==========================================================================
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "75020a3db6bd4b5b970ce2f8f76f3b22", "evento": "LOG_SANITIZADO", "sink": "log", "acao": "mascarado", "categorias": ["CPF"], "quantidade": 2, "severidade": "media", "rota": "/demo/erro", "metodo": "GET", "autenticado": false}
+LOG> ERROR cuidadados.erros: erro interno na requisição
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/home/claude/citizentech/app/pii/middleware.py", line 78, in __call__
+    await self.app(scope, receive_replay, send_com_trace)
+  File "/home/claude/citizentech/app/taint/resposta.py", line 57, in __call__
+    await self._com_filtro_de_resposta(scope, receive, send, ctx)
+  File "/home/claude/citizentech/app/taint/resposta.py", line 93, in _com_filtro_de_resposta
+    await self.app(scope, receive, interceptar)
+  File "/usr/local/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 1330, in handle
+    await super().handle(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/routing.py", line 282, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 372, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/citizentech/app/main.py", line 79, in erro
+    raise RuntimeError("falha ao processar cpf ***.982.***-25")
+RuntimeError: falha ao processar cpf ***.982.***-25
+
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "75020a3db6bd4b5b970ce2f8f76f3b22", "evento": "ERRO_INTERNO", "sink": "erro", "acao": "bloqueado", "categorias": [], "quantidade": 1, "severidade": "media", "rota": "/demo/erro", "metodo": "GET", "autenticado": false}
+DEPOIS:
+  HTTP 500  corpo: {"erro":"Erro interno. Tente novamente mais tarde.","trace_id":"75020a3db6bd4b5b970ce2f8f76f3b22"}
+-> CPF ou 'Traceback' na resposta: False
+
+==========================================================================
+2D) Usuário AUTENTICADO: CPF passa (auditado), senha NUNCA sai
+==========================================================================
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "0b2d5efb5e1f430fbf3df6400438c3bc", "evento": "PII_RECEBIDA", "sink": "entrada", "acao": "marcada", "categorias": ["CPF"], "quantidade": 1, "severidade": "media", "rota": "/demo/eco-inseguro", "metodo": "POST", "autenticado": true}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "0b2d5efb5e1f430fbf3df6400438c3bc", "evento": "PII_EM_RESPOSTA_AUTENTICADA", "sink": "resposta", "acao": "permitido", "categorias": ["CPF"], "quantidade": 1, "severidade": "baixa", "rota": "/demo/eco-inseguro", "metodo": "POST", "autenticado": true}
+CPF no corpo, com token:
+  HTTP 200  corpo: {"obs":"cpf 529.982.247-25"}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "11b2e8247f644106a372c548dcde11ff", "evento": "PII_RECEBIDA", "sink": "entrada", "acao": "marcada", "categorias": ["SENHA"], "quantidade": 1, "severidade": "alta", "rota": "/demo/eco-inseguro", "metodo": "POST", "autenticado": true}
+{"ts": "2026-11-13T22:19:00+00:00", "trace_id": "11b2e8247f644106a372c548dcde11ff", "evento": "RESPOSTA_BLOQUEADA", "sink": "resposta", "acao": "bloqueado", "categorias": ["SENHA"], "quantidade": 1, "severidade": "alta", "rota": "/demo/eco-inseguro", "metodo": "POST", "autenticado": true}
+senha no corpo, com token:
+  HTTP 403  corpo: {"erro": "Resposta bloqueada para proteger dados pessoais.", "trace_id": "11b2e8247f644106a372c548dcde11ff"}
+-> senha na resposta: False
+
+==========================================================================
+3) AUDITORIA — eventos registrados (só tipo, categoria e gravidade; nunca o valor)
+==========================================================================
+  LOG_SANITIZADO                 sink=log      acao=mascarado  cat=CPF,SENHA  sev=alta  auth=não
+  LOG_SANITIZADO                 sink=log      acao=mascarado  cat=CPF        sev=media auth=não
+  LOG_SANITIZADO                 sink=log      acao=mascarado  cat=CPF        sev=media auth=não
+  PII_RECEBIDA                   sink=entrada  acao=marcada    cat=CPF        sev=media auth=não
+  RESPOSTA_BLOQUEADA             sink=resposta acao=bloqueado  cat=CPF        sev=media auth=não
+  PII_RECEBIDA                   sink=entrada  acao=marcada    cat=CPF,SENHA  sev=alta  auth=não
+  ENTRADA_REFLETIDA_BLOQUEADA    sink=erro     acao=bloqueado  cat=CPF,SENHA  sev=alta  auth=não
+  LOG_SANITIZADO                 sink=log      acao=mascarado  cat=CPF        sev=media auth=não
+  ERRO_INTERNO                   sink=erro     acao=bloqueado  cat=-          sev=media auth=não
+  PII_RECEBIDA                   sink=entrada  acao=marcada    cat=CPF        sev=media auth=sim
+  PII_EM_RESPOSTA_AUTENTICADA    sink=resposta acao=permitido  cat=CPF        sev=baixa auth=sim
+  PII_RECEBIDA                   sink=entrada  acao=marcada    cat=SENHA      sev=alta  auth=sim
+  RESPOSTA_BLOQUEADA             sink=resposta acao=bloqueado  cat=SENHA      sev=alta  auth=sim
+-> 13 eventos; valores pessoais crus na auditoria: 0 de 3
+
+==========================================================================
+RESUMO
+==========================================================================
+ANTES: vazava em log, resposta e erro 422. DEPOIS: nenhum valor cru sai.
+RESULTADO: APROVADO

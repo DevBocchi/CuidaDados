@@ -1,0 +1,47 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+rootdir: /home/claude/citizentech
+configfile: pytest.ini
+testpaths: tests
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 36 items
+
+tests/test_pii.py::test_cpf_valido_e_invalidos PASSED                    [  2%]
+tests/test_pii.py::test_classificar_chave_normaliza_acento_e_camelcase PASSED [  5%]
+tests/test_pii.py::test_mascara_cpf_no_formato_do_professor PASSED       [  8%]
+tests/test_pii.py::test_exemplo_do_professor_documento_e_tagueado_e_mascarado PASSED [ 11%]
+tests/test_pii.py::test_senha_e_saude_sao_redigidas_por_inteiro PASSED   [ 13%]
+tests/test_pii.py::test_rg_por_chave_mantem_so_o_final PASSED            [ 16%]
+tests/test_pii.py::test_texto_livre_cpf_valido_e_mascarado_invalido_nao PASSED [ 19%]
+tests/test_pii.py::test_caminho_em_listas_aninhadas PASSED               [ 22%]
+tests/test_pii.py::test_campos_vazios_nao_geram_achado PASSED            [ 25%]
+tests/test_pii.py::test_estrutura_muito_funda_e_redigida PASSED          [ 27%]
+tests/test_pii.py::test_achados_nunca_carregam_valor_original PASSED     [ 30%]
+tests/test_pii.py::test_middleware_sanitiza_corpo_e_query_e_poe_trace_id PASSED [ 33%]
+tests/test_pii.py::test_handler_continua_recebendo_o_corpo_original PASSED [ 36%]
+tests/test_pii.py::test_json_invalido_e_varrido_como_texto PASSED        [ 38%]
+tests/test_pii.py::test_corpo_acima_do_limite_gera_achado_de_estrutura PASSED [ 41%]
+tests/test_taint.py::test_escanear_e_idempotente PASSED                  [ 44%]
+tests/test_taint.py::test_asterisco_nao_escapa_da_protecao PASSED        [ 47%]
+tests/test_taint.py::test_sensitive_nao_vaza_ao_imprimir_formatar_ou_serializar PASSED [ 50%]
+tests/test_taint.py::test_marcar_embrulha_chaves_sensiveis_e_cpf_em_texto PASSED [ 52%]
+tests/test_taint.py::test_sanitizar_texto_chave_valor_e_valor_solto PASSED [ 55%]
+tests/test_taint.py::test_log_com_cpf_solto_e_mascarado_e_auditado PASSED [ 58%]
+tests/test_taint.py::test_log_de_senha_em_fstring_e_mascarado PASSED     [ 61%]
+tests/test_taint.py::test_log_de_variavel_sensitive_nao_imprime_valor PASSED [ 63%]
+tests/test_taint.py::test_stack_trace_no_log_e_sanitizado PASSED         [ 66%]
+tests/test_taint.py::test_resposta_com_pii_para_nao_autenticado_e_bloqueada PASSED [ 69%]
+tests/test_taint.py::test_resposta_sem_pii_passa_para_todos PASSED       [ 72%]
+tests/test_taint.py::test_autenticado_recebe_pii_e_fica_auditado PASSED  [ 75%]
+tests/test_taint.py::test_senha_nunca_sai_nem_para_autenticado PASSED    [ 77%]
+tests/test_taint.py::test_token_invalido_ou_expirado_conta_como_nao_autenticado PASSED [ 80%]
+tests/test_taint.py::test_resposta_ja_sanitizada_do_demo_pii_nao_e_bloqueada PASSED [ 83%]
+tests/test_taint.py::test_422_nao_reflete_o_corpo_enviado PASSED         [ 86%]
+tests/test_taint.py::test_500_devolve_mensagem_generica_e_sanitiza_o_log PASSED [ 88%]
+tests/test_taint.py::test_corpo_marcado_logado_nao_vaza PASSED           [ 91%]
+tests/test_taint.py::test_rotas_demo_so_existem_com_modo_demo PASSED     [ 94%]
+tests/test_taint.py::test_auditoria_grava_e_lista_sem_valores PASSED     [ 97%]
+tests/test_taint.py::test_token_valido_adulterado_expirado_e_outro_segredo PASSED [100%]
+
+============================== 36 passed in 0.39s ==============================

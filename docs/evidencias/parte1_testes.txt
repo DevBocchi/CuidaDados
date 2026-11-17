@@ -1,0 +1,26 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+rootdir: /home/claude/citizentech
+configfile: pytest.ini
+testpaths: tests
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 15 items
+
+tests/test_pii.py::test_cpf_valido_e_invalidos PASSED                    [  6%]
+tests/test_pii.py::test_classificar_chave_normaliza_acento_e_camelcase PASSED [ 13%]
+tests/test_pii.py::test_mascara_cpf_no_formato_do_professor PASSED       [ 20%]
+tests/test_pii.py::test_exemplo_do_professor_documento_e_tagueado_e_mascarado PASSED [ 26%]
+tests/test_pii.py::test_senha_e_saude_sao_redigidas_por_inteiro PASSED   [ 33%]
+tests/test_pii.py::test_rg_por_chave_mantem_so_o_final PASSED            [ 40%]
+tests/test_pii.py::test_texto_livre_cpf_valido_e_mascarado_invalido_nao PASSED [ 46%]
+tests/test_pii.py::test_caminho_em_listas_aninhadas PASSED               [ 53%]
+tests/test_pii.py::test_campos_vazios_nao_geram_achado PASSED            [ 60%]
+tests/test_pii.py::test_estrutura_muito_funda_e_redigida PASSED          [ 66%]
+tests/test_pii.py::test_achados_nunca_carregam_valor_original PASSED     [ 73%]
+tests/test_pii.py::test_middleware_sanitiza_corpo_e_query_e_poe_trace_id PASSED [ 80%]
+tests/test_pii.py::test_handler_continua_recebendo_o_corpo_original PASSED [ 86%]
+tests/test_pii.py::test_json_invalido_e_varrido_como_texto PASSED        [ 93%]
+tests/test_pii.py::test_corpo_acima_do_limite_gera_achado_de_estrutura PASSED [100%]
+
+============================== 15 passed in 0.25s ==============================

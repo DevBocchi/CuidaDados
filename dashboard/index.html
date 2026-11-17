@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CuidaDados · Risco Cidadão</title>
+  <link rel="stylesheet" href="/dashboard/painel.css">
+</head>
+<body>
+  <header>
+    <h1>CuidaDados</h1>
+    <p class="sub">Painel Executivo · <strong>Risco Cidadão</strong></p>
+  </header>
+
+  <main>
+    <section class="acesso" aria-label="Acesso">
+      <label for="token">Token de acesso (gerado pelo administrador)</label>
+      <div class="linha">
+        <input id="token" type="password" autocomplete="off" spellcheck="false">
+        <button id="atualizar" type="button">Atualizar agora</button>
+      </div>
+      <p id="aviso" class="aviso" role="alert"></p>
+    </section>
+
+    <section id="indicador" class="indicador nivel-cinza" aria-live="polite" aria-label="Indicador Risco Cidadão">
+      <div class="selo" aria-hidden="true"><span id="icone">?</span></div>
+      <div class="textos">
+        <p class="pequeno">Risco Cidadão — última <span id="janela">60</span> min</p>
+        <p class="grande"><span id="rotulo">Sem dados</span></p>
+        <p class="pontos"><span id="pontos">–</span> <span class="de">de 100 pontos</span></p>
+        <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Pontuação de risco">
+          <div id="preenchimento"></div>
+        </div>
+        <p id="resumo" class="resumo">Informe o token e clique em “Atualizar agora”.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="t-explica">
+      <h2 id="t-explica">O que aconteceu, em palavras simples</h2>
+      <ul id="lista" class="lista"><li class="vazio">Nenhuma informação carregada.</li></ul>
+    </section>
+
+    <section aria-labelledby="t-formula">
+      <h2 id="t-formula">Como o indicador é calculado</h2>
+      <p>Somamos pontos dos eventos de segurança da última hora, conforme a gravidade do dado envolvido. O máximo é 100.</p>
+      <table>
+        <caption class="so-leitor">Pesos e faixas do Risco Cidadão</caption>
+        <thead><tr><th scope="col">Gravidade</th><th scope="col">Pontos por evento</th><th scope="col">Exemplo</th></tr></thead>
+        <tbody id="tabela-pesos"></tbody>
+      </table>
+      <ul class="faixas">
+        <li class="faixa f-verde"><strong>✔ Verde · Tranquilo:</strong> <span id="f-verde">0 a 9</span> pontos</li>
+        <li class="faixa f-amarelo"><strong>! Amarelo · Atenção:</strong> <span id="f-amarelo">10 a 29</span> pontos</li>
+        <li class="faixa f-vermelho"><strong>✖ Vermelho · Crítico:</strong> <span id="f-vermelho">30 ou mais</span> pontos</li>
+      </ul>
+      <p class="pequeno">Mensagens “geradas por IA” passam por validação (sem links, sem dados pessoais, no máximo 2 frases). Se a IA não estiver disponível, usamos uma mensagem padrão.</p>
+    </section>
+  </main>
+
+  <footer><p id="atualizado" class="pequeno">Nenhuma atualização ainda.</p></footer>
+  <script src="/dashboard/painel.js"></script>
+</body>
+</html>

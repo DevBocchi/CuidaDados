@@ -1,0 +1,66 @@
+:root {
+  --fundo: #f4f6f8; --texto: #14202b; --card: #ffffff; --borda: #c9d3dc;
+  --verde-fundo: #e3f4e8; --verde: #14552d;
+  --amarelo-fundo: #fff1c2; --amarelo: #5c4000;
+  --vermelho-fundo: #fde3e3; --vermelho: #7f1010;
+  --cinza-fundo: #e9edf1; --cinza: #33414e;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fundo); color: var(--texto); font: 18px/1.5 system-ui, "Segoe UI", Arial, sans-serif; }
+header, main, footer { max-width: 920px; margin: 0 auto; padding: 16px; }
+h1 { margin: 0; font-size: 1.6rem; }
+h2 { font-size: 1.25rem; margin: 28px 0 8px; }
+.sub { margin: 4px 0 0; color: #3b4a58; }
+.pequeno { font-size: .9rem; color: #3b4a58; margin: 0; }
+section { margin-bottom: 8px; }
+.acesso { background: var(--card); border: 1px solid var(--borda); border-radius: 12px; padding: 16px; }
+.acesso label { display: block; font-weight: 600; margin-bottom: 6px; }
+.linha { display: flex; gap: 8px; flex-wrap: wrap; }
+input { flex: 1 1 260px; font: inherit; padding: 10px 12px; border: 2px solid #6b7b8a; border-radius: 8px; }
+button { font: inherit; font-weight: 700; padding: 10px 18px; border: 0; border-radius: 8px; background: #123b66; color: #fff; cursor: pointer; }
+button:hover { background: #0c2a4a; }
+:focus-visible { outline: 3px solid #ff8c00; outline-offset: 2px; }
+.aviso { min-height: 1.5em; margin: 8px 0 0; font-weight: 600; color: var(--vermelho); }
+
+.indicador { display: flex; gap: 20px; align-items: center; margin-top: 16px; padding: 20px; border-radius: 16px; border: 3px solid; }
+.selo { flex: 0 0 auto; width: 110px; height: 110px; border-radius: 50%; display: grid; place-items: center; font-size: 3.4rem; font-weight: 800; color: #fff; }
+.textos { flex: 1 1 auto; min-width: 0; }
+.textos p { margin: 0; }
+.grande { font-size: 2.2rem; font-weight: 800; line-height: 1.15; }
+.pontos { font-size: 1.3rem; font-weight: 700; }
+.de { font-weight: 400; font-size: 1rem; }
+.resumo { margin-top: 10px !important; }
+.barra { height: 16px; background: #ffffffaa; border: 2px solid currentColor; border-radius: 10px; overflow: hidden; margin: 10px 0 0; }
+#preenchimento { height: 100%; width: 0; background: currentColor; transition: width .4s; }
+
+.nivel-verde { background: var(--verde-fundo); color: var(--verde); border-color: var(--verde); }
+.nivel-verde .selo { background: var(--verde); }
+.nivel-amarelo { background: var(--amarelo-fundo); color: var(--amarelo); border-color: var(--amarelo); }
+.nivel-amarelo .selo { background: #8a5d00; }
+.nivel-vermelho { background: var(--vermelho-fundo); color: var(--vermelho); border-color: var(--vermelho); }
+.nivel-vermelho .selo { background: var(--vermelho); }
+.nivel-cinza { background: var(--cinza-fundo); color: var(--cinza); border-color: var(--cinza); }
+.nivel-cinza .selo { background: var(--cinza); }
+
+.lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.lista li { background: var(--card); border: 1px solid var(--borda); border-left: 8px solid var(--cinza); border-radius: 10px; padding: 12px 14px; }
+.lista li.vazio { border-left-color: var(--borda); color: #3b4a58; }
+.lista li.alta { border-left-color: var(--vermelho); }
+.lista li.media { border-left-color: #8a5d00; }
+.lista li.baixa { border-left-color: var(--verde); }
+.meta { font-size: .85rem; color: #3b4a58; margin-top: 4px !important; }
+.selo-ia { display: inline-block; font-size: .8rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: #e0e7ff; color: #1e2a78; margin-right: 6px; }
+.selo-padrao { background: #e5e7eb; color: #1f2933; }
+
+table { border-collapse: collapse; width: 100%; background: var(--card); }
+th, td { text-align: left; border: 1px solid var(--borda); padding: 8px 10px; }
+th { background: #e9edf1; }
+.so-leitor { position: absolute; left: -9999px; }
+.faixas { list-style: none; padding: 0; display: grid; gap: 8px; margin: 12px 0; }
+.faixa { padding: 10px 14px; border-radius: 8px; border: 2px solid; }
+.f-verde { background: var(--verde-fundo); color: var(--verde); border-color: var(--verde); }
+.f-amarelo { background: var(--amarelo-fundo); color: var(--amarelo); border-color: var(--amarelo); }
+.f-vermelho { background: var(--vermelho-fundo); color: var(--vermelho); border-color: var(--vermelho); }
+footer { color: #3b4a58; }
+@media (max-width: 560px) { .indicador { flex-direction: column; text-align: center; } .grande { font-size: 1.8rem; } }
+@media (prefers-reduced-motion: reduce) { #preenchimento { transition: none; } }
